@@ -1,13 +1,22 @@
 module Lib
   ( calculateFuelFrom
   , displayResult
+  , getFuel
   ) where
+
+getFuel :: Integer -> Integer
+getFuel mass =
+  if fuel <= 8
+    then fuel
+    else fuel + getFuel fuel
+  where
+    fuel = mass `div` 3 - 2
 
 calculateFuelFrom :: String -> Integer
 calculateFuelFrom contents = foldr (+) 0 fuels
   where
     modules = getMassesFrom contents
-    fuels = map fuelForModule modules
+    fuels = map getFuel modules
 
 getMassesFrom :: String -> [Integer]
 getMassesFrom contents = map getMassFrom entries
