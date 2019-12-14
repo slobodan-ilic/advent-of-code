@@ -1,10 +1,15 @@
 module Lib
   ( getNextCoordinate
-  , getIntersection
   , getCoordinates
+  , getInstructions
+  , getIntersection
   , getIntersections
   , getSegments
+  , getMinDistance
   ) where
+
+import Data.List
+import Data.List.Split
 
 type Coordinate = (Int, Int)
 
@@ -28,14 +33,22 @@ getIntersection a b =
     ((x1b, y1b), (x2b, y2b)) = b
     aTb = (x1a == x2a && y1b == y2b)
     bTa = (y1a == y2a && x1b == x2b)
-    xaXxb = (x1a > x1b && x1a < x2b || x1a < x1b && x1a > x2b)
-    yaXyb = (y1a > y1b && y1a < y2b || y1a < y1b && y1a > y2b)
+    xaXxb =
+      (x1a > x1b && x1a < x2b || x1a < x1b && x1a > x2b) &&
+      (y1b < y1a && y1b > y2a || y1b > y1a && y1b < y2a)
+    yaXyb =
+      (y1a > y1b && y1a < y2b || y1a < y1b && y1a > y2b) &&
+      (x1b < x1a && x1b > x2a || x1b > x1a && x1b < x2a)
     parallel = (x1a == x2a && x1b == x2b) || (y1a == y2a && y1b == y2b)
     intersection =
       if aTb && xaXxb
-        then Just (x1a, y1b)
+        then if (x1a, y1b) == (0, 0)
+               then Nothing
+               else Just (x1a, y1b)
         else if bTa && yaXyb
-               then Just (x1b, y1a)
+               then if (x1b, y1a) == (0, 0)
+                      then Nothing
+                      else Just (x1b, y1a)
                else Nothing
 
 getNextCoordinate :: Coordinate -> Instruction -> Coordinate
@@ -79,3 +92,16 @@ getIntersections a (h:xs) =
     intersection = getIntersection a h
     Just coord = intersection
     coordinates = getIntersections a xs
+
+getInstructions :: String -> [String]
+getInstructions contents = splitOn "," contents
+
+getMinDistance :: String -> Int
+getMinDistance contents = head $ sort distances
+  where
+    instructions = map getInstructions $ lines contents
+    coords = map (getCoordinates (0, 0)) instructions
+    segments = map getSegments coords
+    wire1:wire2:[] = segments
+    intersections = foldr (++) [] [getIntersections seg wire2 | seg <- wire1]
+    distances = map (\(x, y) -> abs x + abs y) intersections

@@ -15,6 +15,7 @@ main = do
       , testGetCoordinates
       , testGetSegments
       , testGetIntersections
+      , testGetMinDistance
       ]
 
 testGetIntersection :: TestTree
@@ -24,8 +25,10 @@ testGetIntersection =
       getIntersection ((2, 0), (3, 0)) ((-1, 1), (1, 1))
     assertEqual "Parallel doesn't intersect" Nothing $
       getIntersection ((2, 0), (3, 0)) ((2, 1), (3, 1))
-    assertEqual "Intersects at (0, 0)" (Just (0, 0)) $
+    assertEqual "Doesn't intersect at (0, 0)" Nothing $
       getIntersection ((1, 0), (-1, 0)) ((0, 1), (0, -1))
+    assertEqual "Doesn't intersect" Nothing $
+      getIntersection ((0, 0), (75, 0)) ((155, 46), (155, -12))
 
 testGetCoordinates :: TestTree
 testGetCoordinates =
@@ -58,3 +61,10 @@ testGetIntersections =
       getIntersections
         ((0, 0), (3, 0))
         [((1, -1), (1, -2)), ((2, -1), (2, 3)), ((1, -1), (1, 1))]
+
+testGetMinDistance :: TestTree
+testGetMinDistance =
+  testCase "Test getting min distance" $ do
+    assertEqual "First simple example" 159 $
+      getMinDistance
+        "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83"

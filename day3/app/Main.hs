@@ -1,7 +1,9 @@
 module Main where
 
+import Data.List
 import Lib
 
 main :: IO ()
 main = do
-  print "main"
+  contents <- readFile "input.txt"
+  print $ getMinDistance contents
