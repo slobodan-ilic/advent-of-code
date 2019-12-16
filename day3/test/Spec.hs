@@ -15,7 +15,10 @@ main = do
       , testGetCoordinates
       , testGetSegments
       , testGetIntersections
+      , testContainsCoordinate
       , testGetMinDistance
+      , testShortenSegment
+      , testDistance
       ]
 
 testGetIntersection :: TestTree
@@ -68,3 +71,39 @@ testGetMinDistance =
     assertEqual "First simple example" 159 $
       getMinDistance
         "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83"
+
+testContainsCoordinate :: TestTree
+testContainsCoordinate =
+  testCase "Test if segment contains coordinate" $ do
+    assertEqual "Test horizontal contains" True $
+      containsCoordinate ((0, 3), (0, 10)) (0, 5)
+    assertEqual "Test horizontal negative contains" True $
+      containsCoordinate ((0, -3), (0, -10)) (0, -5)
+    assertEqual "Test horizontal doesn't contain" False $
+      containsCoordinate ((0, 3), (0, 10)) (0, 12)
+    assertEqual "Test vertical contains" True $
+      containsCoordinate ((3, 3), (10, 3)) (5, 3)
+    assertEqual "Test vertical negative contains" True $
+      containsCoordinate ((-3, -3), (-10, -3)) (-5, -3)
+    assertEqual "Test vertical doesn't contain" False $
+      containsCoordinate ((3, 3), (10, 3)) (12, 3)
+
+testShortenSegment :: TestTree
+testShortenSegment =
+  testCase "Test shortening segment" $ do
+    assertEqual "Test horizontal shortens" ((0, 3), (0, 5)) $
+      shortenSegment ((0, 3), (0, 10)) (0, 5)
+    assertEqual "Test horizontal doesn't shorten" ((0, 3), (0, 10)) $
+      shortenSegment ((0, 3), (0, 10)) (0, 12)
+    assertEqual "Test vertical shortens" ((3, 3), (5, 3)) $
+      shortenSegment ((3, 3), (10, 3)) (5, 3)
+    assertEqual "Test vertical doesn't shorten" ((3, 3), (10, 3)) $
+      shortenSegment ((3, 3), (10, 3)) (12, 3)
+
+testDistance :: TestTree
+testDistance =
+  testCase "Test distance" $ do
+    assertEqual "Test distance 1" 22 $
+      getDistanceUntil [((20, 3), (0, 3)), ((0, 3), (0, 10))] (0, 5)
+    assertEqual "Test distance 2" 7 $
+      getDistanceUntil [((0, 3), (0, 10))] (0, 12)

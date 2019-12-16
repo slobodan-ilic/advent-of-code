@@ -1,11 +1,17 @@
 module Lib
-  ( getNextCoordinate
+  ( containsCoordinate
+  , distance
   , getCoordinates
+  , getDistanceUntil
   , getInstructions
+  , getIntersectionsFromString
   , getIntersection
   , getIntersections
-  , getSegments
   , getMinDistance
+  , getNextCoordinate
+  , getSegments
+  , getSegmentsUntil
+  , shortenSegment
   ) where
 
 import Data.List
@@ -99,9 +105,46 @@ getInstructions contents = splitOn "," contents
 getMinDistance :: String -> Int
 getMinDistance contents = head $ sort distances
   where
+    intersections = getIntersectionsFromString contents
+    distances = map (\(x, y) -> abs x + abs y) intersections
+
+getIntersectionsFromString :: String -> Coordinates
+getIntersectionsFromString contents = intersections
+  where
     instructions = map getInstructions $ lines contents
     coords = map (getCoordinates (0, 0)) instructions
     segments = map getSegments coords
     wire1:wire2:[] = segments
     intersections = foldr (++) [] [getIntersections seg wire2 | seg <- wire1]
-    distances = map (\(x, y) -> abs x + abs y) intersections
+
+containsCoordinate :: Segment -> Coordinate -> Bool
+containsCoordinate ((x1, y1), (x2, y2)) (x, y) =
+  x1 == x2 && x == x1 && (y < y1 && y > y2 || y > y1 && y < y2) ||
+  y1 == y2 && y == y1 && (x < x1 && x > x2 || x > x1 && x < x2)
+
+shortenSegment :: Segment -> Coordinate -> Segment
+shortenSegment segment coordinate =
+  if containsCoordinate segment coordinate
+    then (a, coordinate)
+    else segment
+  where
+    (a, _) = segment
+
+getSegmentsUntil :: Segments -> Coordinate -> Segments
+getSegmentsUntil segments coordinate =
+  match ++
+  if rest /= []
+    then [shortenSegment (head rest) coordinate]
+    else []
+  where
+    (match, rest) =
+      span (\segment -> not $ containsCoordinate segment coordinate) segments
+
+distance :: Segments -> Int
+distance segments =
+  foldl (+) 0 $
+  map (\((x1, y1), (x2, y2)) -> abs (x1 - x2) + abs (y1 - y2)) segments
+
+getDistanceUntil :: Segments -> Coordinate -> Int
+getDistanceUntil segments coordinate =
+  distance $ getSegmentsUntil segments coordinate
