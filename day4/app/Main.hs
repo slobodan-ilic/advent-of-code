@@ -3,4 +3,5 @@ module Main where
 import Lib
 
 main :: IO ()
-main = print $ countPasswords (254032, 789860)
+main = do
+  print $ countPasswords (254032, 789860)
