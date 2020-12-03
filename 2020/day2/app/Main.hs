@@ -5,4 +5,4 @@ import Lib
 main :: IO ()
 main = do
   contents <- readFile "input.txt"
-  putStrLn "test"
+  putStrLn $ show $ nOkEntries (lines contents)
