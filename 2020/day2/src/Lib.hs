@@ -2,20 +2,20 @@ module Lib
   ( nOkEntries
   ) where
 
+import Data.Bits
 import Data.List.Split
 
 nOkEntries :: [String] -> Int
 nOkEntries entries = sum [fromEnum $ isPassOK pass | pass <- entries]
 
 isPassOK :: String -> Bool
-isPassOK entry = n >= min && n <= max
+isPassOK entry = (pass !! i1 == c) `xor` (pass !! i2 == c)
   where
-    tokens = words entry
-    (min, max) = getLimits $ tokens !! 0
-    char = (tokens !! 1) !! 0
-    n = foldr (\el acc -> acc + fromEnum (el == char)) 0 (tokens !! 2)
+    [indsToken, cToken, pass] = words entry
+    (i1, i2) = getInds $ indsToken
+    c = cToken !! 0
 
-getLimits :: String -> (Int, Int)
-getLimits token = (read strMin, read strMax)
+getInds :: String -> (Int, Int)
+getInds token = (read strMin - 1, read strMax - 1)
   where
     [strMin, strMax] = splitOn "-" token
