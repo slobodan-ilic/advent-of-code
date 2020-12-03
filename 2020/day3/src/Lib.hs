@@ -1,18 +1,20 @@
 module Lib
-  ( nTrees
-  , hit
+  ( treesProd
   ) where
 
-nTrees :: [String] -> Int
-nTrees lines = count 0 lines (1, 3)
+treesProd :: [String] -> [(Int, Int)] -> Int
+treesProd lines slopes = product $ map (\slope -> nTrees lines slope) slopes
 
-count :: Int -> [String] -> (Int, Int) -> Int
-count acc lines (x, y)
+nTrees :: [String] -> (Int, Int) -> Int
+nTrees lines slope = count 0 lines slope slope
+
+count :: Int -> [String] -> (Int, Int) -> (Int, Int) -> Int
+count acc lines (x, y) (xd, yd)
   | x >= length lines = acc
-  | otherwise = count (acc + inc) lines newPos
+  | otherwise = count (acc + inc) lines newPos (xd, yd)
   where
     inc = fromEnum $ hit lines (x, y)
-    newPos = (x + 1, y + 3)
+    newPos = (x + xd, y + yd)
 
 hit :: [String] -> (Int, Int) -> Bool
 hit lines (x, y) = (lines !! i) !! j == '#'
