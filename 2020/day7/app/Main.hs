@@ -5,5 +5,4 @@ import Lib
 main :: IO ()
 main = do
   contents <- readFile "input.txt"
-  putStrLn $
-    show $ length $ getPaths (map processRule (lines contents)) ["shinygold"]
+  putStrLn $ show $ getTotalBags (map processRule (lines contents)) "shinygold"

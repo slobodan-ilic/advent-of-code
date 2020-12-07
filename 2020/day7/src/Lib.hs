@@ -1,6 +1,6 @@
 module Lib
   ( processRule
-  , getPaths
+  , getTotalBags
   ) where
 
 import Data.List.Split
@@ -21,27 +21,48 @@ type Count = Int
 
 type Key = String
 
-getPaths :: [Rule] -> [Key] -> [Key]
+type Rules = [Rule]
+
+-- Part 2
+-- ---------------------------------
+getTotalBags :: Rules -> Key -> Count
+getTotalBags rules key =
+  case contents of
+    Nothing -> 0
+    Just entries ->
+      sum
+        [ count + count * (getTotalBags rules key')
+        | (Entry key' count) <- entries
+        ]
+  where
+    (Rule _ (BagContents contents)) = findRule rules key
+
+findRule :: Rules -> Key -> Rule
+findRule rules key = head $ dropWhile (\(Rule key' _) -> key' /= key) rules
+
+-- Part 1
+-- ---------------------------------
+getPaths :: Rules -> [Key] -> [Key]
 getPaths rules keys = getPaths' [] rules keys
 
-getPaths' :: [Key] -> [Rule] -> [Key] -> [Key]
+getPaths' :: [Key] -> Rules -> [Key] -> [Key]
 getPaths' acc _ [] = acc
 getPaths' acc rules keys = getPaths' (acc ++ new) rules containers
   where
     containers = getContainers rules keys
     new = filter (\el -> not (elem el acc)) containers
 
-getContainers :: [Rule] -> [Key] -> [Key]
+getContainers :: Rules -> [Key] -> [Key]
 getContainers rules keys = getContainers' [] rules keys
 
-getContainers' :: [Key] -> [Rule] -> [Key] -> [Key]
+getContainers' :: [Key] -> Rules -> [Key] -> [Key]
 getContainers' acc _ [] = acc
 getContainers' acc rules (k:keys) = getContainers' (acc ++ new) rules keys
   where
     containers = getContainersForKey rules k
     new = filter (\el -> not (elem el acc)) containers
 
-getContainersForKey :: [Rule] -> Key -> [Key]
+getContainersForKey :: Rules -> Key -> [Key]
 getContainersForKey [] _ = []
 getContainersForKey (rule@(Rule key' _):rules) key =
   case hasKey rule key of
