@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version:      1.12
 
 -- This file has been generated from package.yaml by hpack version 0.33.0.
 --
@@ -6,57 +6,57 @@ cabal-version: 1.12
 --
 -- hash: 7bdc53a148656197618f651d5f1a94b1f47a110fd47f01acedbcc6dd34e9d293
 
-name:           day8
-version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/slobodan-ilic/day8#readme>
-homepage:       https://github.com/slobodan-ilic/day8#readme
-bug-reports:    https://github.com/slobodan-ilic/day8/issues
-author:         Slobodan Ilic
-maintainer:     slobodan.a.ilic@gmail.com
-copyright:      MIT
-license:        BSD3
-license-file:   LICENSE
-build-type:     Simple
+name:               day8
+version:            0.1.0.0
+description:
+  Please see the README on GitHub at <https://github.com/slobodan-ilic/day8#readme>
+
+homepage:           https://github.com/slobodan-ilic/day8#readme
+bug-reports:        https://github.com/slobodan-ilic/day8/issues
+author:             Slobodan Ilic
+maintainer:         slobodan.a.ilic@gmail.com
+copyright:          MIT
+license:            BSD3
+license-file:       LICENSE
+build-type:         Simple
 extra-source-files:
-    README.md
-    ChangeLog.md
+  README.md
+  ChangeLog.md
 
 source-repository head
-  type: git
+  type:     git
   location: https://github.com/slobodan-ilic/day8
 
 library
-  exposed-modules:
-      Lib
-  other-modules:
-      Paths_day8
-  hs-source-dirs:
-      src
+  exposed-modules:  Lib
+  other-modules:    Paths_day8
+  hs-source-dirs:   src
   build-depends:
-      base >=4.7 && <5
+      base        >=4.7 && <5
+    , containers
+    , split
+
   default-language: Haskell2010
 
 executable day8-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_day8
-  hs-source-dirs:
-      app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  main-is:          Main.hs
+  other-modules:    Paths_day8
+  hs-source-dirs:   app
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      base  >=4.7 && <5
     , day8
+
   default-language: Haskell2010
 
 test-suite day8-test
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
-  other-modules:
-      Paths_day8
-  hs-source-dirs:
-      test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  other-modules:    Paths_day8
+  hs-source-dirs:   test
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      base  >=4.7 && <5
     , day8
+
   default-language: Haskell2010
