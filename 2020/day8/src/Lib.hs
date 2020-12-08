@@ -1,18 +1,21 @@
 module Lib
   ( getOps
-  , getOp
-  , execOps
-  , execOps'
+  , fixProgram
   ) where
 
 import Data.List.Split
 import qualified Data.Set as Set
 
 data Op
-  = NoOp
+  = NoOp Int
   | Acc Int
   | Jmp Int
   deriving (Show, Eq)
+
+data Code
+  = Failed Acc
+  | Success Acc
+  deriving (Show)
 
 type Ops = [Op]
 
@@ -24,14 +27,38 @@ type Acc = Int
 
 type Visited = Set.Set Int
 
-execOps :: Ops -> Int
+fixProgram :: Ops -> Int
+fixProgram ops = fixProgram' 0 ops
+
+fixProgram' :: Pos -> Ops -> Int
+fixProgram' pos ops =
+  case res of
+    Success acc -> acc
+    _ -> fixProgram' (pos + 1) ops
+  where
+    res = execOps $ changeProgram ops pos
+
+changeProgram :: Ops -> Pos -> Ops
+changeProgram ops pos = take pos ops ++ [newOp] ++ drop (pos + 1) ops
+  where
+    op = ops !! pos
+    newOp =
+      case op of
+        (NoOp val) -> Jmp val
+        (Jmp val) -> NoOp val
+        _ -> op
+
+execOps :: Ops -> Code
 execOps ops = execOps' 0 Set.empty 0 ops
 
-execOps' :: Pos -> Visited -> Acc -> Ops -> Int
+execOps' :: Pos -> Visited -> Acc -> Ops -> Code
 execOps' pos visited acc ops =
   case Set.member pos visited of
-    True -> acc
-    _ -> execOps' nextPos newVisited newAcc ops
+    True -> Failed acc
+    _ ->
+      case pos == length ops of
+        True -> Success acc
+        _ -> execOps' nextPos newVisited newAcc ops
   where
     op = ops !! pos
     nextPos =
@@ -52,7 +79,7 @@ getOp line =
   case opStr of
     "acc" -> Just $ Acc param
     "jmp" -> Just $ Jmp param
-    "nop" -> Just $ NoOp
+    "nop" -> Just $ NoOp param
     _ -> Nothing
   where
     [opStr, paramStr] = splitOn " " line
