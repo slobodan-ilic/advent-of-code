@@ -1,5 +1,5 @@
 module Lib
-  ( countPaths
+  ( combinations
   ) where
 
 import Data.List.Split
@@ -12,19 +12,21 @@ type Difference = Int
 
 type Segment = [Difference]
 
-countPaths :: Adapters -> Int
-countPaths adapters = product $ map nPaths segments
+combinations :: Adapters -> Int
+combinations adapters = product $ map nPaths segments
   where
     diffs = diffSegment adapters
-    segments = splitOn [3] diffs
+    segments = filter (/= []) $ splitOn [3] diffs
 
 nPaths :: Segment -> Int
-nPaths segment =
-  case length segment of
-    4 -> 7
-    3 -> 4
-    2 -> 2
-    _ -> 1
+nPaths (d1:[]) = fromEnum $ d1 <= 3
+nPaths (d1:d2:xs)
+  | d1 == 3 = nRest
+  | d1 < 3 = nSkipNext + nRest
+  | otherwise = 0
+  where
+    nRest = nPaths (d2 : xs)
+    nSkipNext = nPaths ((d1 + d2) : xs)
 
 diffSegment :: Adapters -> Segment
 diffSegment (a:[]) = []

@@ -8,4 +8,5 @@ main = do
   contents <- readFile "input.txt"
   putStrLn $
     show $
-    countPaths $ (0 : (sort $ map (\line -> read line :: Int) (lines contents)))
+    combinations $
+    (0 : (sort $ map (\line -> read line :: Int) (lines contents)))
