@@ -7,6 +7,8 @@ module Lib
   , countOccupied
   , process
   , getSize
+  , getFromDirection
+  , getVisible
   ) where
 
 import Data.List.Split
@@ -22,6 +24,8 @@ type SittingArea = [[Seat]]
 type Pos = Int
 
 type Coord = (Int, Int)
+
+type Direction = (Int, Int)
 
 process :: SittingArea -> Int
 process seats =
@@ -48,17 +52,39 @@ updateAtPos (m, n) seats p =
         then Occupied
         else seat
     Occupied ->
-      if nSurOccupied >= 4
+      if nSurOccupied >= 5
         then Empty
         else seat
     _ -> Floor
   where
     seat = atPos (m, n) seats p
-    surrounding = getSurrounding (m, n) seats p
+    -- surrounding = getSurrounding (m, n) seats p
+    surrounding = getVisible seats p
     nSurOccupied = length (filter (== Occupied) surrounding)
 
+getVisible :: SittingArea -> Pos -> [Seat]
+getVisible seats p = map (\dir -> getFromDirection seats coord dir) directions
+  where
+    (m, n) = getSize seats
+    coord = divMod p n
+    incr = [(-1), 0, 1]
+    directions = [(i, j) | i <- incr, j <- incr, (i, j) /= (0, 0)]
+
+getFromDirection :: SittingArea -> Coord -> Direction -> Seat
+getFromDirection seats (i, j) (di, dj)
+  | i < 0 || j < 0 || i >= m || j >= n = Floor
+  | i' < 0 || j' < 0 || i' >= m || j' >= n = Floor
+  | otherwise =
+    case nextSeat of
+      Floor -> getFromDirection seats (i', j') (di, dj)
+      _ -> nextSeat
+  where
+    (m, n) = getSize seats
+    (i', j') = (i + di, j + dj)
+    nextSeat = atCoord seats (i', j')
+
 getSurrounding :: (Int, Int) -> SittingArea -> Pos -> [Seat]
-getSurrounding (m, n) seats p = map (\c -> atCoord (m, n) seats c) surCor
+getSurrounding (m, n) seats p = map (\c -> atCoord seats c) surCor
   where
     (i, j) = divMod p n
     incr = [(-1), 0, 1]
@@ -71,10 +97,12 @@ atPos (m, n) seats p
   where
     (i, j) = divMod p n
 
-atCoord :: (Int, Int) -> SittingArea -> Coord -> Seat
-atCoord (m, n) seats (i, j)
+atCoord :: SittingArea -> Coord -> Seat
+atCoord seats (i, j)
   | i < 0 || j < 0 || i >= m || j >= n = Floor
   | otherwise = (seats !! i) !! j
+  where
+    (m, n) = getSize seats
 
 getSize :: SittingArea -> (Int, Int)
 getSize m = ((length m), (length (m !! 0)))
