@@ -7,4 +7,4 @@ import Lib
 main :: IO ()
 main = do
   contents <- readFile "input.txt"
-  putStrLn $ show $ getSum $ lines contents
+  putStrLn $ show $ groupPriorities $ lines contents
