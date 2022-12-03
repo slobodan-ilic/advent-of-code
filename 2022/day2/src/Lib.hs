@@ -10,9 +10,27 @@ data Shape
   | Scissors
   deriving (Show, Eq)
 
+instance Ord Shape where
+  compare x y =
+    case x == y of
+      True -> EQ
+      False ->
+        if y == xVictor
+          then LT
+          else GT
+    where
+      lst = [Rock, Paper, Scissors]
+      buffer = zip (cycle lst) (drop 1 $ cycle lst)
+      xVictor = snd $ head $ dropWhile (\(x', _) -> x' /= x) buffer
+
 type Round = (Shape, Shape)
 
 type Game = [String]
+
+data Result
+  = Lose
+  | Draw
+  | Win
 
 process :: Game -> Int
 process [] = 0
@@ -43,23 +61,17 @@ roundScore (op, me) = shapeVal + result
               Scissors -> 3)
 
 moves :: String -> Round
-moves (a:' ':c:rest) =
-  case a of
-    'A' ->
-      ( Rock
-      , case c of
-          'X' -> Scissors
-          'Y' -> Rock
-          'Z' -> Paper)
-    'B' ->
-      ( Paper
-      , case c of
-          'X' -> Rock
-          'Y' -> Paper
-          'Z' -> Scissors)
-    'C' ->
-      ( Scissors
-      , case c of
-          'X' -> Paper
-          'Y' -> Scissors
-          'Z' -> Rock)
+moves (a:' ':c:rest) = (opMove, meMove)
+  where
+    opMove =
+      case a of
+        'A' -> Rock
+        'B' -> Paper
+        'C' -> Scissors
+    needOrd =
+      case c of
+        'X' -> LT
+        'Y' -> EQ
+        'Z' -> GT
+    lst = [Rock, Paper, Scissors]
+    meMove = head $ dropWhile (\x -> compare opMove x /= needOrd) lst
