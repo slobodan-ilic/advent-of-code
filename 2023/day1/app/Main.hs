@@ -49,7 +49,7 @@ singleWordToNumeralFromEnd line =
       [n | (w, n) <- mapping, reverse (take (length w) (reverse line)) == w]
 
 firstNumeral :: String -> Char
-firstNumeral line =
+fapp/.Main.hs.swoirstNumeral line =
   if elem x ['1' .. '9']
     then x
     else case y of
